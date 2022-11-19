@@ -1,27 +1,16 @@
 <script setup lang="ts">
-import { defineProps, reactive, defineEmits } from 'vue'
-import type { InputTypes, InputDefaultValues } from '../types/input'
+import { defineProps, defineEmits, computed } from 'vue'
+import { InputTypes } from '../types/input'
 
-const INPUT_TYPES: InputTypes = {
-  string: 'string',
-  number: 'number',
-  boolean: 'checkbox'
-}
+const props = defineProps<{ type: string, modelValue?: unknown }>()
+const emit = defineEmits(['update:modelValue'])
 
-const DEFAULT_VALUES: InputDefaultValues = {
-  string: '',
-  boolean: false
-}
-
-const props = defineProps<{ type: string, value: unknown }>()
-
-const input = reactive({ value: props.value ?? DEFAULT_VALUES[props.type] })
-const inputType = INPUT_TYPES[props.type] || INPUT_TYPES.string
-
-const emit = defineEmits(['input'])
-const listener = props.type === 'boolean' ? 'change' : 'input'
+const model = computed({
+  get: () => props.modelValue,
+  set: (value) => emit('update:modelValue', value),
+})
 </script>
 
 <template>
-  <input :type="inputType" v-model="input.value" v-on:[listener]="$emit('input', input.value)">
+  <input :type="InputTypes[props.type]" v-model="model">
 </template>
